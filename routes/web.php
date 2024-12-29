@@ -22,6 +22,8 @@ Route::get('/upload', function () {
     return Inertia::render('Upload');
 })->middleware(['auth', 'verified'])->name('upload');
 
+Route::post('/upload', 'VideoController@store');
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

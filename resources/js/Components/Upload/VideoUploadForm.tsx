@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 
 const VideoUploadForm = () => {
   const [file, setFile] = useState<File | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -15,17 +17,20 @@ const VideoUploadForm = () => {
     if (file) {
       const formData = new FormData();
       formData.append('video', file);
+      setLoading(true);
+      setMessage('');
       try {
-        console.log(formData);
-        return;
         const response = await axios.post('/api/upload', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
         });
-        console.log(response.data);
+        setMessage('Upload successful!');
       } catch (error) {
+        setMessage('Error uploading file.');
         console.error('Error uploading file:', error);
+      } finally {
+        setLoading(false);
       }
     }
   };
@@ -46,9 +51,13 @@ const VideoUploadForm = () => {
       <button
         type="submit"
         className="w-full rounded-lg bg-blue-500 px-4 py-2 font-semibold text-white shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
+        disabled={loading}
       >
-        Upload Video
+        {loading ? 'Uploading...' : 'Upload Video'}
       </button>
+      {message && (
+        <p className="mt-4 text-center text-sm text-gray-600">{message}</p>
+      )}
     </form>
   );
 };
