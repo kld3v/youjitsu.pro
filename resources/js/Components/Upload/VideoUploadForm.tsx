@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 
 const VideoUploadForm = () => {
   const [file, setFile] = useState<File | null>(null);
+  const [title, setTitle] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -12,25 +13,36 @@ const VideoUploadForm = () => {
     }
   };
 
+  const handleTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setTitle(event.target.value);
+  };
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (file) {
       const formData = new FormData();
       formData.append('video', file);
+      formData.append('title', title);
       setLoading(true);
       setMessage('');
       try {
-        const response = await axios.post('/api/upload', formData, {
+        const response = await axios.post('/upload', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
         });
         setMessage('Upload successful!');
+        // Reset the form
+        setFile(null);
+        setTitle('');
       } catch (error) {
         setMessage('Error uploading file.');
         console.error('Error uploading file:', error);
       } finally {
         setLoading(false);
+        setTimeout(() => {
+          setMessage('');
+        }, 5000);
       }
     }
   };
@@ -40,6 +52,15 @@ const VideoUploadForm = () => {
       onSubmit={handleSubmit}
       className="mx-auto max-w-md rounded-lg bg-white p-4 shadow-md"
     >
+      <div className="mb-4">
+        <input
+          type="text"
+          value={title}
+          onChange={handleTitleChange}
+          placeholder="Enter video title"
+          className="block w-full rounded-lg border border-gray-300 bg-gray-50 text-sm text-gray-900 focus:outline-none"
+        />
+      </div>
       <div className="mb-4">
         <input
           type="file"

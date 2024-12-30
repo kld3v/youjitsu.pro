@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\Video;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 
 class VideoController extends Controller
 {
@@ -29,20 +30,32 @@ class VideoController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'video' => 'required|mimes:mp4,mov,avi|max:20480', // Max 20MB for example
+            'video' => 'required|mimes:mp4,mov,avi|max:102400'
         ]);
 
-        $path = $request->file('video')->store('jiujitsu-videos', 'public');
+        if (!Auth::check()) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
 
-        $video = new Video([
-            'path' => $path,
-            'title' => $request->input('title', 'Untitled Video'),
-            // Other metadata like user_id, description, etc.
-        ]);
+        $userId = Auth::id();
 
-        $video->save();
+        try {
+            $path = $request->file('video')->store('jiujitsu-videos', 'public');
 
-        return response()->json(['message' => 'Video uploaded successfully', 'path' => $path]);
+            $video = new Video([
+                'path' => $path,
+                'title' => $request->input('title', 'Untitled Video'),
+                'user_id' => $userId,
+                // Other metadata like description, etc.
+            ]);
+
+            $video->save();
+
+            $url = Storage::url($path);
+            return response()->json(['message' => 'Video uploaded successfully', 'url' => $url]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to upload video', 'message' => $e->getMessage()], 500);
+        }
     }
 
     /**

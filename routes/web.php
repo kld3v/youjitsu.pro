@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\VideoController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -22,7 +23,7 @@ Route::get('/upload', function () {
     return Inertia::render('Upload');
 })->middleware(['auth', 'verified'])->name('upload');
 
-Route::post('/upload', 'VideoController@store');
+Route::post('/upload', [VideoController::class, 'store']);
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
