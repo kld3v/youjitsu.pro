@@ -5,6 +5,8 @@ use App\Models\Video;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Inertia\Inertia;
 
 class VideoController extends Controller
 {
@@ -13,7 +15,22 @@ class VideoController extends Controller
      */
     public function index()
     {
-        //
+        if (!Auth::check()) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        $user = Auth::user();
+        
+        $videos = $user->videos->map(function ($video) {
+            $video->url = Storage::url($video->path);
+            Log::info($video);
+            return $video;
+        });
+    
+        return Inertia::render('Dashboard', [
+            'videos' => $videos,
+        ]);
+
+   
     }
 
     /**
@@ -52,6 +69,7 @@ class VideoController extends Controller
             $video->save();
 
             $url = Storage::url($path);
+            Log::info('Video URL: ' . $url);
             return response()->json(['message' => 'Video uploaded successfully', 'url' => $url]);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to upload video', 'message' => $e->getMessage()], 500);
