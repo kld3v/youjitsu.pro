@@ -106,5 +106,24 @@ class VideoController extends Controller
     public function destroy(string $id)
     {
         //
+    if (!Auth::check()) {
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
+
+    $user = Auth::user();
+    $video = Video::find($id);
+
+    if (!$video || $video->user_id !== $user->id) {
+        return response()->json(['error' => 'Video not found or unauthorized'], 404);
+    }
+
+    try {
+        Storage::disk('public')->delete($video->path);
+        $video->delete(); // This will perform a soft delete if the Video model uses the SoftDeletes trait
+
+    return redirect()->route('videos.index');
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'Failed to delete video', 'message' => $e->getMessage()], 500);
+    }
     }
 }

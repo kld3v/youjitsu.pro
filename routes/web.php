@@ -15,13 +15,14 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/dashboard', [VideoController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [VideoController::class, 'index'])->middleware(['auth', 'verified'])->name('videos.index');
 
 Route::get('/upload', function () {
     return Inertia::render('Upload');
 })->middleware(['auth', 'verified'])->name('upload');
 
-Route::post('/upload', [VideoController::class, 'store']);
+Route::post('/upload', [VideoController::class, 'store'])->name('videos.store');
+Route::delete('/videos/{id}', [VideoController::class, 'destroy'])->name('videos.destroy');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
