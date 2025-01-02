@@ -33,13 +33,18 @@ const VideoList: React.FC<VideoListProps> = ({
     <div className="video-list">
       {videos.map((video) => (
         <div key={video.id} className="video-item">
-          <h3>{video.title}</h3>
+          <h3 className="text-white">{video.title}</h3>
+          <p className="text-white">
+            {video.description ? 'description:' : ' '} {video.description}
+          </p>
           <video controls>
             <source src={video.url} type="video/mp4" />
             Your browser does not support the video tag.
           </video>
           <form onSubmit={deleteVideo} data-video-id={video.id}>
-            <button type="submit">Delete</button>
+            <button type="submit">
+              <p className="text-red-500">Delete</p>
+            </button>
           </form>
         </div>
       ))}

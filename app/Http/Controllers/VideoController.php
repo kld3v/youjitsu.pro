@@ -46,22 +46,24 @@ class VideoController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'video' => 'required|mimes:mp4,mov,avi|max:102400'
-        ]);
-
         if (!Auth::check()) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
+        $request->validate([
+            'video' => 'required|mimes:mp4,mov,avi|max:102400'
+        ]);
+
         $userId = Auth::id();
 
         try {
-            $path = $request->file('video')->store('jiujitsu-videos', 'public');
+            // $path = $request->file('video')->store('jiujitsu-videos', 'public');
+            $path = Storage::disk('s3')->put('videos', $request->file('video'));
 
             $video = new Video([
                 'path' => $path,
                 'title' => $request->input('title', 'Untitled Video'),
+                'description' => $request->input('description', ''),
                 'user_id' => $userId,
                 // Other metadata like description, etc.
             ]);
@@ -118,7 +120,7 @@ class VideoController extends Controller
     }
 
     try {
-        Storage::disk('public')->delete($video->path);
+        Storage::disk('s3')->delete($video->path);
         $video->delete(); // This will perform a soft delete if the Video model uses the SoftDeletes trait
 
     return redirect()->route('videos.index');

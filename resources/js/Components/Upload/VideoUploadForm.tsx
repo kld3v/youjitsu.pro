@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 const VideoUploadForm = () => {
   const [file, setFile] = useState<File | null>(null);
   const [title, setTitle] = useState<string>('');
+  const [description, setDescription] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -17,12 +18,19 @@ const VideoUploadForm = () => {
     setTitle(event.target.value);
   };
 
+  const handleDescriptionChange = (
+    event: React.ChangeEvent<HTMLTextAreaElement>,
+  ) => {
+    setDescription(event.target.value);
+  };
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (file) {
       const formData = new FormData();
       formData.append('video', file);
       formData.append('title', title);
+      formData.append('description', description);
       setLoading(true);
       setMessage('');
       try {
@@ -35,6 +43,7 @@ const VideoUploadForm = () => {
         // Reset the form
         setFile(null);
         setTitle('');
+        setDescription('');
       } catch (error) {
         setMessage('Error uploading file.');
         console.error('Error uploading file:', error);
@@ -67,6 +76,14 @@ const VideoUploadForm = () => {
           onChange={handleFileChange}
           accept="video/*"
           className="block w-full cursor-pointer rounded-lg border border-gray-300 bg-gray-50 text-sm text-gray-900 focus:outline-none"
+        />
+      </div>
+      <div className="mb-4">
+        <textarea
+          value={description}
+          onChange={handleDescriptionChange}
+          placeholder="Enter video description"
+          className="block w-full rounded-lg border border-gray-300 bg-gray-50 text-sm text-gray-900 focus:outline-none"
         />
       </div>
       <button
