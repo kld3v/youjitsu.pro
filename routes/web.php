@@ -24,6 +24,12 @@ Route::get('/upload', function () {
 Route::post('/upload', [VideoController::class, 'store'])->name('videos.store');
 Route::delete('/videos/{id}', [VideoController::class, 'destroy'])->name('videos.destroy');
 
+Route::get('/review/{id}', function ($id) {
+    return Inertia::render('Review', [
+        'id' => $id,
+    ]);
+})->middleware(['auth', 'verified'])->name('review');
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

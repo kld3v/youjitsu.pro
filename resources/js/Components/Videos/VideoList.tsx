@@ -1,4 +1,4 @@
-import { useForm } from '@inertiajs/react';
+import { Link, useForm } from '@inertiajs/react';
 import React, { FormEventHandler } from 'react';
 
 export interface Video {
@@ -13,11 +13,7 @@ interface VideoListProps {
   videos: Video[];
 }
 
-const VideoList: React.FC<VideoListProps> = ({
-  videos,
-}: {
-  videos: Video[];
-}) => {
+const VideoList: React.FC<VideoListProps> = ({ videos }) => {
   const { delete: destroy } = useForm();
 
   const deleteVideo: FormEventHandler<HTMLFormElement> = (e) => {
@@ -32,20 +28,25 @@ const VideoList: React.FC<VideoListProps> = ({
   return (
     <div className="video-list">
       {videos.map((video) => (
-        <div key={video.id} className="video-item">
-          <h3 className="text-white">{video.title}</h3>
-          <p className="text-white">
-            {video.description ? 'description:' : ' '} {video.description}
-          </p>
-          <video controls>
-            <source src={video.url} type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
-          <form onSubmit={deleteVideo} data-video-id={video.id}>
-            <button type="submit">
-              <p className="text-red-500">Delete</p>
-            </button>
-          </form>
+        <div key={video.id} className="video-item mb-4 flex">
+          <div className="video-thumbnail mr-4 rounded border border-white">
+            <video controls className="h-32 w-48">
+              <source src={video.url} type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+          <div className="video-details flex-1">
+            <h3 className="text-lg font-bold text-white">{video.title}</h3>
+            <p className="mb-2 text-white">
+              {video.description ? 'Description:' : ''} {video.description}
+            </p>
+            <Link href="/"></Link>
+            <form onSubmit={deleteVideo} data-video-id={video.id}>
+              <button type="submit" className="text-red-500">
+                Delete
+              </button>
+            </form>
+          </div>
         </div>
       ))}
     </div>
