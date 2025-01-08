@@ -1,10 +1,16 @@
+import SelectDojo from '@/Components/Submission/SelectDojo';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { PageProps } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
+import { useState } from 'react';
 
 export default function CreateSubmission() {
-  const { props } = usePage<PageProps<{ id: string; video: any }>>();
-  const { id: videoId, video } = props;
+  const { props } =
+    usePage<PageProps<{ id: string; video: any; dojos: any[] }>>();
+  const { id: videoId, video, dojos } = props;
+
+  const [selectedDojoId, setSelectedDojoId] = useState('');
+  const [selectedReviewerId, setSelectedReviewerId] = useState('');
 
   console.log(props);
 
@@ -14,11 +20,8 @@ export default function CreateSubmission() {
         <div className="w-full">
           <h1 className="text-xl">Submit Video</h1>
           <p>Submit video for review with ID: {videoId}</p>
-          <input
-            type="text"
-            className="mt-4 w-full rounded border border-gray-300 bg-gray-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none focus:ring"
-            placeholder="Select Dojo"
-          />
+          <SelectDojo dojos={dojos} setSelectedDojo={setSelectedDojoId} />
+          {selectedDojoId && <p>you have selected dojo id: {selectedDojoId}</p>}
           <input
             type="text"
             className="mt-4 w-full rounded border border-gray-300 bg-gray-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none focus:ring"
