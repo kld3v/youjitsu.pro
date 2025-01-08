@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\SubmissionController;
 use App\Http\Controllers\VideoController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -24,11 +26,12 @@ Route::get('/upload', function () {
 Route::post('/upload', [VideoController::class, 'store'])->name('videos.store');
 Route::delete('/videos/{id}', [VideoController::class, 'destroy'])->name('videos.destroy');
 
-Route::get('/review/{id}', function ($id) {
-    return Inertia::render('Review', [
-        'id' => $id,
-    ]);
-})->middleware(['auth', 'verified'])->name('review');
+Route::get('/reviews/{id}', [ReviewController::class, 'show'])->middleware(['auth', 'verified'])->name('reviews');
+
+// create seperate sumission controller for this. 
+Route::get('create-submission/{id}', [SubmissionController::class, 'show'])->middleware(['auth', 'verified'])->name('submission.show');
+Route::post('store-submission/{id}', [SubmissionController::class, 'store'])->middleware(['auth', 'verified'])->name('submission.store');
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
