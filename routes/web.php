@@ -30,6 +30,7 @@ Route::get('/reviews/{id}', [ReviewController::class, 'show'])->middleware(['aut
 
 // create seperate sumission controller for this. 
 Route::get('create-submission/{id}', [SubmissionController::class, 'show'])->middleware(['auth', 'verified'])->name('submission.show');
+
 Route::post('store-submission/{id}', [SubmissionController::class, 'store'])->middleware(['auth', 'verified'])->name('submission.store');
 
 

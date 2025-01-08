@@ -21,6 +21,7 @@ const SelectDojo: FC<SelectDojoProps> = ({ dojos, setSelectedDojo }) => {
       setSuggestions(filteredDojos);
     } else {
       setSuggestions([]);
+      setSelectedDojo('');
     }
   };
   return (

@@ -34,7 +34,7 @@ class DojoFactory extends Factory
         
 
         return [
-            'name' => $this->faker->unique()->randomElement($prefixes) . ' ' . $this->faker->randomElement($suffixes)
+            'name' => $this->faker->unique()->randomElement($prefixes) . fake()->name() . $this->faker->randomElement($suffixes) . fake()->name() . fake()->randomDigit()
         ];
     }
 }
