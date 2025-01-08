@@ -27,9 +27,9 @@ export default function CreateSubmission() {
     }
   }, [selectedDojoId]);
 
-  const { post, errors, processing, recentlySuccessful } = useForm({
-    dojo_id: selectedDojoId,
-    reviewer_id: selectedReviewerId,
+  const { post, errors, processing, setData, reset } = useForm({
+    dojo_id: '',
+    reviewer_id: '',
     notes,
   });
 
@@ -39,18 +39,25 @@ export default function CreateSubmission() {
       alert('Please select a dojo and a reviewer');
       return;
     }
+    setData({
+      dojo_id: selectedDojoId,
+      reviewer_id: selectedReviewerId,
+      notes,
+    });
 
-    // testing
-    alert(
-      'selectedDojoId: ' +
-        selectedDojoId +
-        ' selectedReviewerId: ' +
-        selectedReviewerId +
-        ' notes: ' +
-        notes,
-    );
-    return;
-    post(route('submission.store', { id: videoId }));
+    post(route('submission.store', { id: videoId }), {
+      onSuccess: () => {
+        reset();
+        setSelectedDojoId('');
+        setSelectedReviewerId('');
+        setNotes('');
+        alert('Submission created successfully');
+      },
+      onError: (errors) => {
+        console.log(errors);
+        alert('Submission failed');
+      },
+    });
   };
 
   return (
@@ -82,7 +89,7 @@ export default function CreateSubmission() {
               onClick={submit}
               className="my-2 inline-block rounded bg-blue-600 px-6 py-2.5 text-xs font-medium uppercase leading-tight text-white shadow-md transition duration-150 ease-in-out hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg"
             >
-              Submit video for review
+              {processing ? 'Submitting...' : 'Submit video for review'}
             </button>
           </div>
         </div>
