@@ -3,9 +3,9 @@ import { FC, useState } from 'react';
 
 interface SelectDojoProps {
   dojos: Dojo[];
-  setSelectedDojo: React.Dispatch<React.SetStateAction<string>>;
+  setData: any;
 }
-const SelectDojo: FC<SelectDojoProps> = ({ dojos, setSelectedDojo }) => {
+const SelectDojo: FC<SelectDojoProps> = ({ dojos, setData }) => {
   const [inputValue, setInputValue] = useState('');
   const [suggestions, setSuggestions] = useState<any[]>([]);
 
@@ -21,7 +21,7 @@ const SelectDojo: FC<SelectDojoProps> = ({ dojos, setSelectedDojo }) => {
       setSuggestions(filteredDojos);
     } else {
       setSuggestions([]);
-      setSelectedDojo('');
+      setData('dojo_id', '');
     }
   };
   return (
@@ -41,7 +41,7 @@ const SelectDojo: FC<SelectDojoProps> = ({ dojos, setSelectedDojo }) => {
               className="cursor-pointer border-b border-gray-700 bg-gray-800 p-2 text-white hover:bg-gray-700"
               onClick={() => {
                 setInputValue(dojo.name);
-                setSelectedDojo(dojo.id);
+                setData('dojo_id', dojo.id);
                 setSuggestions([]);
               }}
             >

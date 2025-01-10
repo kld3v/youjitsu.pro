@@ -13,11 +13,9 @@ return new class extends Migration
     {
         Schema::create('reviews', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('submission_id')->constrained()->cascadeOnDelete();
             $table->foreignId('reviewer_id')->constrained('users')->cascadeOnDelete();
             $table->text('feedback')->nullable();
             $table->string('status')->default('pending');
-            $table->string('review_video_url')->nullable();
             $table->timestamps();
 
         });

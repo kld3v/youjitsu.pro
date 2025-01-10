@@ -6,18 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class Review extends Model
 {
+    protected $table = 'reviews';
+
     protected $fillable = [
-        'submission_id',
         'reviewer_id',
         'feedback',
         'status',
-        'review_video_url',
+        'video_id',
     ];
-
-    public function submission()
-    {
-        return $this->belongsTo(Submission::class);
-    }
 
     public function reviewer()
     {

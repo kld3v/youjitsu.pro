@@ -11,50 +11,44 @@ export default function CreateSubmission() {
       PageProps<{ id: string; video: any; dojos: Dojo[]; reviewers: any[] }>
     >();
   const { id: videoId, video, dojos, reviewers } = props;
-  const [selectedDojoId, setSelectedDojoId] = useState('');
-  const [selectedReviewerId, setSelectedReviewerId] = useState('');
   const [suggestedReviewers, setSuggestedReviewers] = useState<any[]>([]);
-  const [notes, setNotes] = useState('');
+
+  const { data, post, errors, processing, setData, reset } = useForm({
+    dojo_id: '',
+    reviewer_id: '',
+    notes: '',
+  });
+
+  const { dojo_id, reviewer_id } = data;
 
   useEffect(() => {
-    if (selectedDojoId) {
+    if (dojo_id) {
       const reviewersArray = reviewers.filter(
-        (reviewer) => reviewer?.dojo_id === selectedDojoId,
+        (reviewer) => reviewer?.dojo_id === dojo_id,
       );
       setSuggestedReviewers(reviewersArray);
     } else {
       setSuggestedReviewers([]);
     }
-  }, [selectedDojoId]);
-
-  const { post, errors, processing, setData, reset } = useForm({
-    dojo_id: '',
-    reviewer_id: '',
-    notes,
-  });
+  }, [dojo_id]);
 
   const submit: FormEventHandler = (e) => {
     e.preventDefault();
-    if (!selectedDojoId || !selectedReviewerId) {
+    if (!dojo_id || !reviewer_id) {
       alert('Please select a dojo and a reviewer');
       return;
     }
-    setData({
-      dojo_id: selectedDojoId,
-      reviewer_id: selectedReviewerId,
-      notes,
-    });
-
-    post(route('submission.store', { id: videoId }), {
+    setData('dojo_id', dojo_id);
+    setData('reviewer_id', reviewer_id);
+    post(route('reviews.store', { id: videoId }), {
       onSuccess: () => {
         reset();
-        setSelectedDojoId('');
-        setSelectedReviewerId('');
-        setNotes('');
+        setData('dojo_id', '');
+        setData('reviewer_id', '');
         alert('Submission created successfully');
       },
-      onError: (errors) => {
-        console.log(errors);
+      onError: (err) => {
+        console.log(err);
         alert('Submission failed');
       },
     });
@@ -66,27 +60,26 @@ export default function CreateSubmission() {
         <div className="w-full">
           <h1 className="text-xl">Submit Video For Review</h1>
           <p>Submit video for review with ID: {videoId}</p>
-          <SelectDojo dojos={dojos} setSelectedDojo={setSelectedDojoId} />
-          {selectedDojoId && <p>you have selected dojo id: {selectedDojoId}</p>}
+          <SelectDojo dojos={dojos} setData={setData} />
+          {dojo_id && <p>you have selected dojo id: {dojo_id}</p>}
           <SelectReviewer
             suggestedReviewers={suggestedReviewers}
-            setSelectedReviewerId={setSelectedReviewerId}
+            setData={setData}
           />
-          {selectedReviewerId && (
-            <p>you have selected reviewer id: {selectedReviewerId}</p>
-          )}
+          {reviewer_id && <p>you have selected reviewer id: {reviewer_id}</p>}
 
           <div>
             <textarea
               className="mt-4 w-full rounded border border-gray-300 bg-gray-800 px-4 py-2 text-white focus:border-blue-500 focus:outline-none focus:ring"
               placeholder="Notes"
-              onChange={(e) => setNotes(e.target.value)}
+              onChange={(e) => setData('notes', e.target.value)}
             ></textarea>
           </div>
 
           <div>
             <button
               onClick={submit}
+              disabled={processing}
               className="my-2 inline-block rounded bg-blue-600 px-6 py-2.5 text-xs font-medium uppercase leading-tight text-white shadow-md transition duration-150 ease-in-out hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg"
             >
               {processing ? 'Submitting...' : 'Submit video for review'}
