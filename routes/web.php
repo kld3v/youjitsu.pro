@@ -28,10 +28,10 @@ Route::delete('/videos/{id}', [VideoController::class, 'destroy'])->name('videos
 
 Route::get('/reviews/{id}', [ReviewController::class, 'show'])->middleware(['auth', 'verified'])->name('reviews');
 
-// create seperate sumission controller for this. 
-Route::get('create-submission/{id}', [SubmissionController::class, 'show'])->middleware(['auth', 'verified'])->name('submission.show');
-
 Route::post('reviews/{id}', [ReviewController::class, 'store'])->middleware(['auth', 'verified'])->name('reviews.store');
+
+Route::get('create-submission/{id}', [SubmissionController::class, 'create'])->middleware(['auth', 'verified'])->name('submission.create');
+
 
 
 Route::middleware('auth')->group(function () {

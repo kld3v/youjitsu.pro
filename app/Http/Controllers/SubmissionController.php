@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Auth;
 class SubmissionController extends Controller
 {
     
-    public function show($id)
+    public function create($id)
     {
         $video = Video::find($id);
         $video->url = Storage::url($video->path);
