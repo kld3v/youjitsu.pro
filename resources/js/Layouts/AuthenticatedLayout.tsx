@@ -71,8 +71,12 @@ export default function Authenticated({
 
                   <Dropdown.Content>
                     <Dropdown.Link href={route('profile.edit')}>
-                      Profile
+                      Profile (
+                      {user.role.charAt(0).toUpperCase() +
+                        user.role.slice(1).toLowerCase()}
+                      )
                     </Dropdown.Link>
+                    <hr />
                     <Dropdown.Link
                       href={route('logout')}
                       method="post"

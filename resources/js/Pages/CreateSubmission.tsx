@@ -38,8 +38,6 @@ export default function CreateSubmission() {
       alert('Please select a dojo and a reviewer');
       return;
     }
-    setData('dojo_id', dojo_id);
-    setData('reviewer_id', reviewer_id);
     post(route('reviews.store', { id: videoId }), {
       onSuccess: () => {
         reset();
