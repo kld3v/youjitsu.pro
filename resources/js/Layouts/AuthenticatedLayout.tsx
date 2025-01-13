@@ -39,6 +39,14 @@ export default function Authenticated({
                 >
                   Upload
                 </NavLink>
+                {user.role === 'sensei' && (
+                  <NavLink
+                    href={route('manage-reviews.index')}
+                    active={route().current('manage-reviews.index')}
+                  >
+                    Manage Reviews
+                  </NavLink>
+                )}
               </div>
             </div>
 

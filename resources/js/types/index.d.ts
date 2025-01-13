@@ -21,3 +21,18 @@ export type Dojo = {
   id: number;
   name: string;
 };
+
+export type SenseiReview = {
+  id: number;
+  feedback: string;
+  description: string;
+  title: string;
+  status: 'pending' | 'completed' | 'completed (viewed)';
+  notes?: string;
+  video: {
+    url: string;
+    user: {
+      name: string;
+    };
+  };
+};

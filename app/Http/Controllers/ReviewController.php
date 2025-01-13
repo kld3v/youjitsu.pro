@@ -44,6 +44,7 @@ class ReviewController extends Controller
             'feedback' => '',
             'status' => 'pending',
             'video_id' => $id,
+            'notes' => $validated['notes'],
         ]);
         $review->save();
 

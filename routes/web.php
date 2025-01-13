@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ManageReviewsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\SubmissionController;
@@ -29,6 +30,8 @@ Route::delete('/videos/{id}', [VideoController::class, 'destroy'])->name('videos
 Route::get('/reviews/{id}', [ReviewController::class, 'show'])->middleware(['auth', 'verified'])->name('reviews');
 
 Route::post('reviews/{id}', [ReviewController::class, 'store'])->middleware(['auth', 'verified'])->name('reviews.store');
+
+Route::get('manage-reviews', [ManageReviewsController::class, 'index'])->middleware(['auth', 'verified'])->name('manage-reviews.index');
 
 Route::get('create-submission/{id}', [SubmissionController::class, 'create'])->middleware(['auth', 'verified'])->name('submission.create');
 
