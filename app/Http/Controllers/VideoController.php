@@ -65,7 +65,6 @@ class VideoController extends Controller
                 'title' => $request->input('title', 'Untitled Video'),
                 'description' => $request->input('description', ''),
                 'user_id' => $userId,
-                // Other metadata like description, etc.
             ]);
 
             $video->save();

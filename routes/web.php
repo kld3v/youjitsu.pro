@@ -25,6 +25,7 @@ Route::get('/upload', function () {
 })->middleware(['auth', 'verified'])->name('upload');
 
 Route::post('/upload', [VideoController::class, 'store'])->name('videos.store');
+
 Route::delete('/videos/{id}', [VideoController::class, 'destroy'])->name('videos.destroy');
 
 Route::get('/reviews/{id}', [ReviewController::class, 'show'])->middleware(['auth', 'verified'])->name('reviews');
@@ -32,6 +33,13 @@ Route::get('/reviews/{id}', [ReviewController::class, 'show'])->middleware(['aut
 Route::post('reviews/{id}', [ReviewController::class, 'store'])->middleware(['auth', 'verified'])->name('reviews.store');
 
 Route::get('manage-reviews', [ManageReviewsController::class, 'index'])->middleware(['auth', 'verified'])->name('manage-reviews.index');
+
+Route::get('manage-reviews/{id}', [ManageReviewsController::class, 'create'])->middleware(['auth', 'verified'])->name('manage-reviews.create');
+
+Route::post('manage-reviews/{id}', [ManageReviewsController::class, 'store'])->middleware(['auth', 'verified'])->name('manage-reviews.store');
+
+
+
 
 Route::get('create-submission/{id}', [SubmissionController::class, 'create'])->middleware(['auth', 'verified'])->name('submission.create');
 

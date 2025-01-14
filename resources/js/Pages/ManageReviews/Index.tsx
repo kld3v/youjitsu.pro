@@ -1,6 +1,6 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { PageProps, SenseiReview } from '@/types';
-import { usePage } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 export default function ManageReviews() {
   const { props } =
     usePage<
@@ -23,7 +23,7 @@ export default function ManageReviews() {
           reviews.map((review) => (
             <div
               key={review.id}
-              className="border-3 grid grid-cols-2 border border-solid p-4"
+              className="border-3 my-4 grid grid-cols-2 rounded-lg border border-solid p-4"
             >
               <div>
                 <p>Review request for {review.video.user.name}</p>
@@ -42,6 +42,16 @@ export default function ManageReviews() {
                   {review.title && review.title}
                 </p>
                 <p className="font-bold">{review.status}</p>
+                <Link
+                  href={route('manage-reviews.create', { id: review.id })}
+                  className="text-white"
+                >
+                  <button className="my-2 rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700">
+                    {review.status === 'pending'
+                      ? 'Start Review'
+                      : 'Review Again'}
+                  </button>
+                </Link>
               </div>
               <div className="grid justify-items-center">
                 <video controls className="h-48 w-48">

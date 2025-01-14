@@ -13,6 +13,9 @@ class Review extends Model
         'feedback',
         'status',
         'video_id',
+        'review_video_id',
+        'notes'
+
     ];
 
     public function reviewer()
@@ -23,5 +26,10 @@ class Review extends Model
     public function video()
     {
         return $this->belongsTo(Video::class);
+    }
+
+    public function reviewVideo()
+    {
+        return $this->belongsTo(Video::class, 'review_video_id');
     }
 }

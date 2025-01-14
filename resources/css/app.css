@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+#annotation-canvas {
+  position: absolute;
+  pointer-events: auto; /* Allow drawing interactions */
+  border-color: yellowgreen;
+}
