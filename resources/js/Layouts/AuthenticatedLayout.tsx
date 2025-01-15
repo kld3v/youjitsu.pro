@@ -39,6 +39,14 @@ export default function Authenticated({
                 >
                   Upload
                 </NavLink>
+                {user.role === 'sensei' && (
+                  <NavLink
+                    href={route('manage-reviews.index')}
+                    active={route().current('manage-reviews.index')}
+                  >
+                    Manage Reviews
+                  </NavLink>
+                )}
               </div>
             </div>
 
@@ -71,8 +79,12 @@ export default function Authenticated({
 
                   <Dropdown.Content>
                     <Dropdown.Link href={route('profile.edit')}>
-                      Profile
+                      Profile (
+                      {user.role.charAt(0).toUpperCase() +
+                        user.role.slice(1).toLowerCase()}
+                      )
                     </Dropdown.Link>
+                    <hr />
                     <Dropdown.Link
                       href={route('logout')}
                       method="post"

@@ -1,17 +1,51 @@
 import { Config } from 'ziggy-js';
 
 export interface User {
-    id: number;
-    name: string;
-    email: string;
-    email_verified_at?: string;
+  id: number;
+  name: string;
+  email: string;
+  email_verified_at?: string;
+  role: 'student' | 'sensei';
 }
 
 export type PageProps<
-    T extends Record<string, unknown> = Record<string, unknown>,
+  T extends Record<string, unknown> = Record<string, unknown>,
 > = T & {
-    auth: {
-        user: User;
+  auth: {
+    user: User;
+  };
+  ziggy: Config & { location: string };
+};
+
+export type Dojo = {
+  id: number;
+  name: string;
+};
+
+interface Reviewer {
+  name: string;
+}
+
+export type StudentReview = {
+  id: number;
+  feedback: string;
+  reviewer: Reviewer;
+  review_video: {
+    url: string;
+  };
+};
+
+export type SenseiReview = {
+  id: number;
+  feedback: string;
+  description: string;
+  title: string;
+  status: 'pending' | 'completed' | 'completed (viewed)';
+  notes?: string;
+  video?: {
+    url: string;
+    user: {
+      name: string;
     };
-    ziggy: Config & { location: string };
+  };
 };
