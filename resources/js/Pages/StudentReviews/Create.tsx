@@ -38,7 +38,7 @@ export default function CreateSubmission() {
       alert('Please select a dojo and a reviewer');
       return;
     }
-    post(route('reviews.store', { id: videoId }), {
+    post(route('student-reviews.store', { id: videoId }), {
       onSuccess: () => {
         reset();
         setData('dojo_id', '');
@@ -57,7 +57,7 @@ export default function CreateSubmission() {
       <div className="grid grid-cols-2 gap-6 space-y-4 px-12 py-12 text-white">
         <div className="w-full">
           <h1 className="text-xl">Submit Video For Review</h1>
-          <p>Submit video for review with ID: {videoId}</p>
+          <p>Submit video {videoId} for review </p>
           <SelectDojo dojos={dojos} setData={setData} />
           {dojo_id && <p>you have selected dojo id: {dojo_id}</p>}
           <SelectReviewer

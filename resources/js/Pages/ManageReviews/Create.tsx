@@ -17,6 +17,8 @@ export default function CreateSenseiReview() {
   );
   const [recordedChunks, setRecordedChunks] = useState<Blob[]>([]);
   const recordedChunksRef = useRef<Blob[]>([]);
+  const [submissionSuccessful, setSubmissionSuccessful] = useState(false); // Track submission state
+
   /**
    * Start Recording
    */
@@ -284,10 +286,7 @@ export default function CreateSenseiReview() {
 
       if (response.status === 200) {
         console.log('Video uploaded successfully:', response.data);
-        alert('Video uploaded successfully!');
-        setTimeout(() => {
-          window.location.href = route('manage-reviews.index');
-        }, 3000);
+        setSubmissionSuccessful(true);
       } else {
         console.error('Failed to upload video:', response);
         alert('Failed to upload video!');
@@ -298,17 +297,36 @@ export default function CreateSenseiReview() {
     }
   };
 
+  if (submissionSuccessful) {
+    return (
+      <AuthenticatedLayout>
+        <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100">
+          <h1 className="text-2xl font-bold text-green-600">
+            Video Submitted Successfully!
+          </h1>
+          <p className="mt-2 text-gray-700">
+            Your video has been submitted for review.
+          </p>
+          <button
+            className="mt-4 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+            onClick={() =>
+              (window.location.href = route('manage-reviews.index'))
+            } // Navigate to the dashboard
+          >
+            Back to Dashboard
+          </button>
+        </div>
+      </AuthenticatedLayout>
+    );
+  }
   return (
     <AuthenticatedLayout
       header={
         <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-          Manage Reviews
+          Creating review for {review.video.user.name}
         </h2>
       }
     >
-      <div className="px-12 py-12 text-white">
-        <p>Manage review with id: {review.id}</p>
-      </div>
       <div
         id="review-studio"
         className="relative grid h-full justify-items-center rounded-lg p-8"
@@ -323,8 +341,6 @@ export default function CreateSenseiReview() {
           <canvas
             id="annotation-canvas"
             ref={canvasRef}
-            // add style
-
             style={tool !== null ? { zIndex: 2 } : { zIndex: 0 }}
             className="absolute border border-green-500"
             onMouseDown={handleMouseDown}
@@ -371,6 +387,7 @@ export default function CreateSenseiReview() {
             Clear Annotations
           </button>
         </div>
+
         {/* Controls */}
         <div id="controls" className="mt-4">
           <button
@@ -409,6 +426,7 @@ export default function CreateSenseiReview() {
 
           <div className="mt-4">
             <button
+              hidden={!previewRef.current}
               onClick={submitReview}
               className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
             >

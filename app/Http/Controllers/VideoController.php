@@ -20,17 +20,14 @@ class VideoController extends Controller
         }
         $user = Auth::user();
         
-        $videos = $user->videos->map(function ($video) {
-            $video->url = Storage::url($video->path);
-            Log::info($video);
+        $videos = $user->videos()->where('is_review', false)->get()->map(function ($video) {
+            $video->url = $video->url;
             return $video;
         });
     
         return Inertia::render('Dashboard', [
             'videos' => $videos,
         ]);
-
-   
     }
 
     /**

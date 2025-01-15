@@ -40,7 +40,9 @@ const VideoList: React.FC<VideoListProps> = ({ videos }) => {
             <p className="mb-2">
               {video.description ? 'Description:' : ''} {video.description}
             </p>
-            <Link href={route('reviews', { id: video.id })}>Reviews</Link>
+            <Link href={route('student-reviews.index', { id: video.id })}>
+              Reviews
+            </Link>
             <form onSubmit={deleteVideo} data-video-id={video.id}>
               <button type="submit" className="text-red-500">
                 Delete

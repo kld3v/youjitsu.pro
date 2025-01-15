@@ -3,6 +3,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class Video extends Model
 {
@@ -17,5 +18,10 @@ class Video extends Model
     public function reviews()
     {
         return $this->hasMany(Review::class);
+    }
+
+    public function getUrlAttribute()
+    {
+        return $this->path? Storage::url($this->path) : null;
     }
 }

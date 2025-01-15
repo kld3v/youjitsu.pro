@@ -28,9 +28,13 @@ Route::post('/upload', [VideoController::class, 'store'])->name('videos.store');
 
 Route::delete('/videos/{id}', [VideoController::class, 'destroy'])->name('videos.destroy');
 
-Route::get('/reviews/{id}', [ReviewController::class, 'show'])->middleware(['auth', 'verified'])->name('reviews');
+Route::get('/video/{id}/student-reviews', [ReviewController::class, 'index'])->middleware(['auth', 'verified'])->name('student-reviews.index');
 
-Route::post('reviews/{id}', [ReviewController::class, 'store'])->middleware(['auth', 'verified'])->name('reviews.store');
+Route::get('/video/{video_id}/student-review/{review_id}', [ReviewController::class, 'show'])->middleware(['auth', 'verified'])->name('student-reviews.show');
+
+Route::get('create-student-review/{id}', [SubmissionController::class, 'create'])->middleware(['auth', 'verified'])->name('student-reviews.create');
+
+Route::post('student-reviews/{id}', [ReviewController::class, 'store'])->middleware(['auth', 'verified'])->name('student-reviews.store');
 
 Route::get('manage-reviews', [ManageReviewsController::class, 'index'])->middleware(['auth', 'verified'])->name('manage-reviews.index');
 
@@ -41,7 +45,6 @@ Route::post('manage-reviews/{id}', [ManageReviewsController::class, 'store'])->m
 
 
 
-Route::get('create-submission/{id}', [SubmissionController::class, 'create'])->middleware(['auth', 'verified'])->name('submission.create');
 
 
 

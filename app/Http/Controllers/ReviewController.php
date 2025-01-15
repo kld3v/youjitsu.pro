@@ -9,7 +9,7 @@ use App\Models\Video;
 use Illuminate\Support\Facades\Storage;
 class ReviewController extends Controller
 {
-    public function show($id)
+    public function index($id)
     {
         $reviews = Review::with([
             'reviewer' => function ($query) {
@@ -22,10 +22,34 @@ class ReviewController extends Controller
         
         $video = Video::find($id);
         $video->url = Storage::url($video->path);
-        return Inertia::render('Reviews', [
+        return Inertia::render('StudentReviews/Index', [
             'id' => $id,
             'reviews' => $reviews,
             'video' => $video
+        ]);
+    }
+    
+    public function show($video_id, $review_id)
+    {
+        $student_video = Video::find($video_id);
+        $student_video->url = $student_video->url;
+        
+
+        $review = Review::with([
+            'reviewer' => function ($query) {
+                $query->select('id', 'name', 'dojo_id'); // Only get the id and name for the reviewer
+            },
+            'reviewer.dojo' => function ($query) {
+                $query->select('id', 'name'); // Only get the id and name for the dojo
+            }, 
+            'reviewVideo'
+           
+        ])->find($review_id);
+        $review->reviewVideo->url = $review->reviewVideo->url;
+        
+        return Inertia::render('StudentReviews/Show', [
+            'review' => $review, 
+            'student_video' => $student_video
         ]);
     }
 

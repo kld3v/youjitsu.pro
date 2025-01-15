@@ -13,21 +13,24 @@ use Illuminate\Support\Facades\Log;
 class ManageReviewsController extends Controller
 {
     public function index () {
-        // get all reviews for the current user where their user id is the reviewer_id
+        // Get all reviews for the current user where their user_id is the reviewer_id
         $reviews = Auth::user()->reviews;
 
+        // Load the related models
         $reviews->load([
             'video',
-            'video.user:id,name' // Load only 'id' and 'name' for the user
+            'video.user:id,name', // Load only 'id' and 'name' for the user
         ]);
-        
-        $reviews->map(function ($review){
-           $review->video->url = Storage::url($review->video->path);
-           return $review; 
-        });
 
+        // Map the reviews to ensure the `url` is explicitly included
+        $reviews->each(function ($review) {
+            if ($review->video) {
+                $review->video->url = $review->video->url; // Accessor called here
+            }
+        });
+        
         return Inertia::render('ManageReviews/Index', [
-            'reviews' => $reviews
+            'reviews' => $reviews,
         ]);
     }
 

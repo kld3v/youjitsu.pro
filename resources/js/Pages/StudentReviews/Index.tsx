@@ -33,7 +33,21 @@ export default function Reviews() {
                 >
                   <p>Sensei: {review.reviewer.name}</p>
                   <p>{review.reviewer?.dojo?.name}</p>
-                  <p>{review.status}</p>
+                  <p>
+                    <i>{review.status}</i>
+                  </p>
+                  {review.status !== 'pending' && (
+                    <Link
+                      href={route('student-reviews.show', {
+                        video_id: videoId,
+                        review_id: review.id,
+                      })}
+                    >
+                      <button className="rounded bg-green-500 px-4 py-2 font-bold text-white hover:bg-green-700">
+                        See Review
+                      </button>
+                    </Link>
+                  )}
                 </div>
               ))
             : 'No reviews'}
@@ -41,7 +55,7 @@ export default function Reviews() {
       </div>
       <div className="px-12 py-12 text-white">
         <Link
-          href={route('submission.create', { id: videoId })}
+          href={route('student-reviews.create', { id: videoId })}
           className="text-white"
         >
           <button className="rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700">

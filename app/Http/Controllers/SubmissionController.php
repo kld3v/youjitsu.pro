@@ -24,7 +24,7 @@ class SubmissionController extends Controller
         if (!$video) {
             abort(404);
         }
-        return Inertia::render('CreateSubmission', [
+        return Inertia::render('StudentReviews/Create', [
             'id' => $id,
             'video' => $video,
             'dojos' => $dojos,
