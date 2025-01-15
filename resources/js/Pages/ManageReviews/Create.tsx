@@ -18,7 +18,7 @@ export default function CreateSenseiReview() {
   const [recordedChunks, setRecordedChunks] = useState<Blob[]>([]);
   const recordedChunksRef = useRef<Blob[]>([]);
   const [submissionSuccessful, setSubmissionSuccessful] = useState(false); // Track submission state
-
+  const [hasFinishedRecording, setHasFinishedRecording] = useState(false);
   /**
    * Start Recording
    */
@@ -101,6 +101,7 @@ export default function CreateSenseiReview() {
     if (mediaRecorder) {
       mediaRecorder.stop();
       setMediaRecorder(null);
+      setHasFinishedRecording(true);
     }
   };
 
@@ -114,32 +115,33 @@ export default function CreateSenseiReview() {
   // To store the starting point of the shape
   const startX = useRef(0);
   const startY = useRef(0);
+
+  const getAdjustedCoordinates = (e: React.MouseEvent) => {
+    if (!canvasRef.current) return { x: 0, y: 0 };
+
+    const rect = canvasRef.current.getBoundingClientRect();
+    const scaleX = canvasRef.current.width / rect.width; // Scale factor for X
+    const scaleY = canvasRef.current.height / rect.height; // Scale factor for Y
+
+    return {
+      x: (e.clientX - rect.left) * scaleX,
+      y: (e.clientY - rect.top) * scaleY,
+    };
+  };
+
   const handleMouseDown = (e: React.MouseEvent) => {
-    // if the canvas is empty, return
     if (!canvasRef.current) return;
-
-    // get the canvas context - this means we can draw on the canvas. more techincally, we can draw on the 2d plane of the canvas.
     const ctx = canvasRef.current.getContext('2d');
-
-    // if the context is null, return. why woudl the context be null? if the canvas is not visible, or if the canvas is not supported by the browser.
     if (!ctx) return;
 
-    // Set the drawing flag to true.
     setIsDrawing(true);
+    const { x, y } = getAdjustedCoordinates(e);
+    startX.current = x;
+    startY.current = y;
 
-    // Store the starting position
-    // offsetX and offsetY are the coordinates of the mouse pointer relative to the target element (canvas)
-    // eg if the canvas is at 0,0 and the mouse is at 10,10, offsetX and offsetY will be 10,10
-    // meaning the mouse is 10px away from the top and 10px away from the left of the canvas
-    startX.current = e.nativeEvent.offsetX;
-    startY.current = e.nativeEvent.offsetY;
-
-    // Begin the drawing path (for freehand drawing)
     if (tool === 'pen') {
-      // Begin the path
       ctx.beginPath();
-      // Move the pen to the starting point
-      ctx.moveTo(startX.current, startY.current);
+      ctx.moveTo(x, y);
     }
 
     if (tool === 'circle') {
@@ -149,50 +151,37 @@ export default function CreateSenseiReview() {
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!isDrawing || !canvasRef.current) return;
-
     const ctx = canvasRef.current.getContext('2d');
     if (!ctx) return;
 
+    const { x, y } = getAdjustedCoordinates(e);
+
     if (tool === 'pen') {
-      // Freehand drawing
-      ctx.lineTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
+      ctx.lineTo(x, y);
       ctx.stroke();
     } else if (tool === 'rectangle') {
-      // Rectangle drawing
-      const width = e.nativeEvent.offsetX - startX.current;
-      const height = e.nativeEvent.offsetY - startY.current;
+      const width = x - startX.current;
+      const height = y - startY.current;
 
-      // Clear the canvas overlay before drawing new shapes
       ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-
-      // Draw the rectangle
       ctx.strokeRect(startX.current, startY.current, width, height);
     } else if (tool === 'circle') {
-      // Clear the canvas before redrawing to avoid overlapping
       ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-
-      // Calculate the radius based on the distance from start to current mouse position
-      // bit of pythagoras theorem at work here
-      const radius = Math.abs(e.nativeEvent.offsetY - startY.current);
-
-      // Draw the circle
+      const radius = Math.sqrt(
+        (x - startX.current) ** 2 + (y - startY.current) ** 2,
+      );
       ctx.beginPath();
       ctx.arc(startX.current, startY.current, radius, 0, 2 * Math.PI);
       ctx.stroke();
     }
   };
 
-  const handleMouseUp = (e: React.MouseEvent) => {
-    if (!canvasRef.current) return;
-
-    const ctx = canvasRef.current.getContext('2d');
-    if (!ctx) return;
-
+  const handleMouseUp = () => {
     setIsDrawing(false);
 
-    // Finalize the path
-    if (tool === 'pen') {
-      ctx.closePath();
+    if (tool === 'pen' && canvasRef.current) {
+      const ctx = canvasRef.current.getContext('2d');
+      ctx?.closePath();
     }
   };
 
@@ -224,7 +213,7 @@ export default function CreateSenseiReview() {
         canvas.style.top = `0px`;
         canvas.style.width = `${rect.width}px`;
         canvas.style.height = `${rect.height - 40}px`;
-        canvas.style.cursor = 'pen';
+        canvas.style.cursor = 'crosshair';
       }
     };
 
@@ -304,9 +293,7 @@ export default function CreateSenseiReview() {
           <h1 className="text-2xl font-bold text-green-600">
             Video Submitted Successfully!
           </h1>
-          <p className="mt-2 text-gray-700">
-            Your video has been submitted for review.
-          </p>
+          <p className="mt-2 text-gray-700">Your review has been submitted.</p>
           <button
             className="mt-4 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
             onClick={() =>
@@ -323,23 +310,22 @@ export default function CreateSenseiReview() {
     <AuthenticatedLayout
       header={
         <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-          Creating review for {review.video.user.name}
+          Creating review for {review.video?.user.name}
         </h2>
       }
     >
       <div
         id="review-studio"
-        className="relative grid h-full justify-items-center rounded-lg p-8"
+        className="flex flex-col items-center justify-center p-8"
       >
         {/* Video Player */}
-        <div className="relative">
+        <div className="relative max-w-5xl">
           <video ref={videoRef} controls className="relative z-[1]">
-            <source src={review.video.url} type="video/mp4" />
+            <source src={review.video?.url} type="video/mp4" />
             Your browser does not support the video tag.
           </video>
           {/* Canvas Overlay */}
           <canvas
-            id="annotation-canvas"
             ref={canvasRef}
             style={tool !== null ? { zIndex: 2 } : { zIndex: 0 }}
             className="absolute border border-green-500"
@@ -348,9 +334,9 @@ export default function CreateSenseiReview() {
             onMouseUp={handleMouseUp}
           ></canvas>
         </div>
-        <div className="absolute right-10 top-0 bg-black bg-opacity-50 p-4 text-white">
+        <div className="right-10 top-0 bg-black bg-opacity-50 p-4 text-white">
           <p>
-            Notes from {review.video.user.name}: <br /> {review?.notes}
+            Notes from {review.video?.user.name}: <br /> {review?.notes}
           </p>
         </div>
 
@@ -415,9 +401,10 @@ export default function CreateSenseiReview() {
 
         {/* Recording Preview */}
 
-        <div>
+        <div className="max-w-5xl" hidden={!hasFinishedRecording}>
+          <h1 className="text-xl text-white">Preview your review</h1>
           <video
-            className="mt-4 w-1/2 justify-center rounded-lg border border-gray-300"
+            className="mt-4 rounded-lg border border-gray-300"
             ref={previewRef}
             id="recording-preview"
             controls
@@ -426,7 +413,6 @@ export default function CreateSenseiReview() {
 
           <div className="mt-4">
             <button
-              hidden={!previewRef.current}
               onClick={submitReview}
               className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
             >
