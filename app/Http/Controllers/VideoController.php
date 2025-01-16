@@ -48,13 +48,12 @@ class VideoController extends Controller
         }
 
         $request->validate([
-            'video' => 'required|mimes:mp4,mov,avi|max:102400'
+            'video' => 'required|mimes:mp4,mov,avi'
         ]);
 
         $userId = Auth::id();
 
         try {
-            // $path = $request->file('video')->store('jiujitsu-videos', 'public');
             $path = Storage::disk('s3')->put('videos', $request->file('video'));
 
             $video = new Video([
