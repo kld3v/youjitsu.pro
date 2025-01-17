@@ -1,7 +1,11 @@
 container_commands:
-  01_setup_permissions:
+  01_permissions:
     command: |
-      chmod -R 775 /var/app/current/storage /var/app/current/bootstrap/cache
-      chown -R webapp:webapp /var/app/current/storage /var/app/current/bootstrap/cache
-  02_migrate:
+      chmod -R 777 /var/app/current/storage /var/app/current/bootstrap/cache
+      chmod 777 /var/app/current/database/database.sqlite
+  02-migrate-database:
     command: "php artisan migrate --force"
+    leader_only: true
+  03-generate-app-key:
+    command: "php artisan key:generate --force"
+    leader_only: true
