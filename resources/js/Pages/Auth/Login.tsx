@@ -48,7 +48,7 @@ export default function Login({
             className="mt-1 block w-full"
             autoComplete="username"
             isFocused={true}
-            //ts-ignore
+            //@ts-ignore
             onChange={(e) => setData('email', e.target.value)}
           />
 
@@ -76,7 +76,7 @@ export default function Login({
             <Checkbox
               name="remember"
               checked={data.remember}
-              //ts-ignore
+              //@ts-ignore
               onChange={(e) => setData('remember', e.target.checked)}
             />
             <span className="ms-2 text-sm text-gray-600 dark:text-gray-400">
