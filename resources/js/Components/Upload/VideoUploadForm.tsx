@@ -39,6 +39,7 @@ const VideoUploadForm = () => {
             'Content-Type': 'multipart/form-data',
           },
         });
+        console.log(response.data);
         setMessage('Upload successful!');
         // Reset the form
         setFile(null);

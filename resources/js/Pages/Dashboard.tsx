@@ -1,10 +1,10 @@
-import VideoList, { Video as VideoType } from '@/Components/Videos/VideoList';
+import VideoList from '@/Components/Videos/VideoList';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { PageProps } from '@/types';
+import { IVideo, PageProps } from '@/types';
 import { Head } from '@inertiajs/react';
 
 interface DashboardProps extends PageProps {
-  videos: VideoType[];
+  videos: IVideo[];
 }
 export default function Dashboard({ videos }: DashboardProps) {
   console.log(videos);

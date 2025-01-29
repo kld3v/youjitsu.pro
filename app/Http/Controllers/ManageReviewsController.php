@@ -22,12 +22,7 @@ class ManageReviewsController extends Controller
             'video.user:id,name', // Load only 'id' and 'name' for the user
         ]);
 
-        // Map the reviews to ensure the `url` is explicitly included
-        $reviews->each(function ($review) {
-            if ($review->video) {
-                $review->video->url = $review->video->url; // Accessor called here
-            }
-        });
+        
         
         return Inertia::render('ManageReviews/Index', [
             'reviews' => $reviews,
@@ -62,25 +57,32 @@ class ManageReviewsController extends Controller
             'feedback'=> 'string|max:1024',
             
         ]);
-
+        
+        $file = $request->file('video');
         try {
 
-            $path = Storage::disk('s3')->put('review-videos', $request->file('video'));
+            // Generate a unique filename to avoid overwrites
+            $filename = uniqid('video_review_') . '.' . $file->getClientOriginalExtension();
+                
+            // Upload the file to DigitalOcean Spaces
+            $success = Storage::disk('spaces')->put($filename, $file->get(), 'public');
+            Log::info('File uploaded? ' . $success ? 'Yes' : 'No');
+
+            // Generate a public URL for the uploaded video
+            $url = Storage::disk('spaces')->url($filename);
+            Log::info('Video URL: ' . $url);
             
             $video = Video::create([
-                'path' => $path,
+                'path' => $url,
                 'user_id' => Auth::id(),
                 'is_review' => true
             ]);
-            
             
             $review->update([
                 'status' => 'reviewed',
                 'review_video_id' => $video->id,
                 'feedback' => $request->input('feedback', '')
             ]);
-
-
 
         } 
         catch (\Throwable $th) {
@@ -90,6 +92,6 @@ class ManageReviewsController extends Controller
         }
 
 
-        return response()->json(['message' => 'Video uploaded successfully', 'url' => Storage::url($path)]);
+        return response()->json(['message' => 'Video uploaded successfully', 201]);
     }
 }

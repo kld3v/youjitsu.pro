@@ -20,8 +20,5 @@ class Video extends Model
         return $this->hasMany(Review::class);
     }
 
-    public function getUrlAttribute()
-    {
-        return $this->path? Storage::url($this->path) : null;
-    }
+   
 }

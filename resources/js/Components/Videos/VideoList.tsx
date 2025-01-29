@@ -1,16 +1,9 @@
+import { IVideo } from '@/types';
 import { Link, useForm } from '@inertiajs/react';
 import React, { FormEventHandler } from 'react';
 
-export interface Video {
-  id: number;
-  title: string;
-  path: string;
-  description?: string;
-  url: string;
-}
-
 interface VideoListProps {
-  videos: Video[];
+  videos: IVideo[];
 }
 
 const VideoList: React.FC<VideoListProps> = ({ videos }) => {
@@ -31,7 +24,7 @@ const VideoList: React.FC<VideoListProps> = ({ videos }) => {
         <div key={video.id} className="video-item mb-4 flex text-white">
           <div className="video-thumbnail mr-4 rounded border border-white">
             <video controls className="h-32 w-48">
-              <source src={video.url} type="video/mp4" />
+              <source src={video.path} type="video/mp4" />
               Your browser does not support the video tag.
             </video>
           </div>

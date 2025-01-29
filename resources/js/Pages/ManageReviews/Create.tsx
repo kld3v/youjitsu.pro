@@ -321,7 +321,7 @@ export default function CreateSenseiReview() {
         {/* Video Player */}
         <div className="relative max-w-5xl">
           <video ref={videoRef} controls className="relative z-[1]">
-            <source src={review.video?.url} type="video/mp4" />
+            <source src={review.video.path} type="video/mp4" />
             Your browser does not support the video tag.
           </video>
           {/* Canvas Overlay */}

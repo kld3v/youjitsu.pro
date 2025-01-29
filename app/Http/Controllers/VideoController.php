@@ -20,10 +20,7 @@ class VideoController extends Controller
         }
         $user = Auth::user();
         
-        $videos = $user->videos()->where('is_review', false)->get()->map(function ($video) {
-            $video->url = $video->url;
-            return $video;
-        });
+        $videos = $user->videos()->where('is_review', false)->get();
     
         return Inertia::render('Dashboard', [
             'videos' => $videos,
@@ -43,35 +40,66 @@ class VideoController extends Controller
      */
     public function store(Request $request)
     {
+        // Check if the user is authenticated
         if (!Auth::check()) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-
+    
+        // Validate the request
         $request->validate([
-            'video' => 'required|mimes:mp4,mov,avi'
+            'video' => 'required|file|mimes:mp4,mov,avi|max:102400', // Limit max size to 100MB
+            'title' => 'nullable|string|max:255',
+            'description' => 'nullable|string|max:500',
         ]);
-
+    
         $userId = Auth::id();
-
+    
         try {
-            $path = Storage::disk('s3')->put('videos', $request->file('video'));
+            Log::info('Starting video upload process...');
+    
+            // Get the uploaded file
+            $file = $request->file('video');
+            if (!$file) {
+                throw new \Exception('No video file found in the request.');
+            }
+            Log::info('File Name: ' . $file->getClientOriginalName());
+    
+            // Generate a unique filename to avoid overwrites
+            $filename = uniqid('video_') . '.' . $file->getClientOriginalExtension();
+    
+            // Upload the file to DigitalOcean Spaces
+            $success = Storage::disk('spaces')->put($filename, $file->get(), 'public');
+            Log::info('File uploaded? ' . $success ? 'Yes' : 'No', ['success' => $success]);
+    
+            // Generate a public URL for the uploaded video
+            $url = Storage::disk('spaces')->url($filename);
+            Log::info('Video URL: ' . $url);
 
+            // Create a new Video model and save it in the database
             $video = new Video([
-                'path' => $path,
+                'path' => $url, // Stored path in Spaces
                 'title' => $request->input('title', 'Untitled Video'),
                 'description' => $request->input('description', ''),
                 'user_id' => $userId,
             ]);
-
             $video->save();
-
-            $url = Storage::url($path);
-            Log::info('Video URL: ' . $url);
-            return response()->json(['message' => 'Video uploaded successfully', 'url' => $url]);
+            
+            return response()->json([
+                'message' => 'Video uploaded successfully',
+                'url' => $url,
+            ], 201);
+            
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Failed to upload video', 'message' => $e->getMessage()], 500);
+            // Log the error and return a failure response
+            Log::error('Error uploading video: ' . $e->getMessage());
+            return response()->json([
+                'error' => 'Failed to upload video',
+                'message' => $e->getMessage(),
+            ], 500);
         }
     }
+    
+    
 
     /**
      * Display the specified resource.
@@ -115,7 +143,7 @@ class VideoController extends Controller
     }
 
     try {
-        Storage::disk('s3')->delete($video->path);
+        Storage::disk('spaces')->delete($video->path);
         $video->delete(); // This will perform a soft delete if the Video model uses the SoftDeletes trait
 
     return redirect()->route('videos.index');

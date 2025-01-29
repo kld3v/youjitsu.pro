@@ -25,14 +25,18 @@ export type Dojo = {
 interface Reviewer {
   name: string;
 }
+export interface IVideo {
+  id: number;
+  title: string;
+  path: string;
+  description?: string;
+}
 
 export type StudentReview = {
   id: number;
   feedback: string;
   reviewer: Reviewer;
-  review_video: {
-    url: string;
-  };
+  review_video: IVideo;
 };
 
 export type SenseiReview = {
@@ -42,8 +46,7 @@ export type SenseiReview = {
   title: string;
   status: 'pending' | 'completed' | 'completed (viewed)';
   notes?: string;
-  video?: {
-    url: string;
+  video: IVideo & {
     user: {
       name: string;
     };

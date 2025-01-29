@@ -1,10 +1,10 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { PageProps, SenseiReview } from '@/types';
+import { IVideo, PageProps, SenseiReview } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 export default function ManageReviews() {
   const { props } =
     usePage<
-      PageProps<{ id: string; reviews: SenseiReview[]; video: { url: string } }>
+      PageProps<{ id: string; reviews: SenseiReview[]; video: IVideo }>
     >();
 
   const { reviews } = props;
@@ -54,7 +54,7 @@ export default function ManageReviews() {
                   </div>
                   <div className="grid justify-items-center">
                     <video controls className="h-48 w-48">
-                      <source src={review.video.url} type="video/mp4" />
+                      <source src={review.video.path} type="video/mp4" />
                       Your browser does not support the video tag.
                     </video>
                   </div>

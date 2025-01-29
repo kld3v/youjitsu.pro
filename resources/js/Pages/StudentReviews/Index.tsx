@@ -1,11 +1,9 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { PageProps } from '@/types';
+import { IVideo, PageProps } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 export default function Reviews() {
   const { props } =
-    usePage<
-      PageProps<{ id: string; reviews: any[]; video: { url: string } }>
-    >();
+    usePage<PageProps<{ id: string; reviews: any[]; video: IVideo }>>();
   const { id: videoId, reviews, video } = props;
 
   console.log(props);
@@ -17,7 +15,7 @@ export default function Reviews() {
         <p>Review for video with ID: {videoId}</p>
 
         <video width="320" height="240" controls>
-          <source src={video.url} type="video/mp4" />
+          <source src={video.path} type="video/mp4" />
           Your browser does not support the video tag.
         </video>
       </div>

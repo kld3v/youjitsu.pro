@@ -1,14 +1,14 @@
 import SelectDojo from '@/Components/Submission/SelectDojo';
 import SelectReviewer from '@/Components/Submission/SelectReviewer';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Dojo, PageProps } from '@/types';
+import { Dojo, IVideo, PageProps } from '@/types';
 import { useForm, usePage } from '@inertiajs/react';
 import { FormEventHandler, useEffect, useState } from 'react';
 
 export default function CreateSubmission() {
   const { props } =
     usePage<
-      PageProps<{ id: string; video: any; dojos: Dojo[]; reviewers: any[] }>
+      PageProps<{ id: string; video: IVideo; dojos: Dojo[]; reviewers: any[] }>
     >();
   const { id: videoId, video, dojos, reviewers } = props;
   const [suggestedReviewers, setSuggestedReviewers] = useState<any[]>([]);
@@ -85,7 +85,11 @@ export default function CreateSubmission() {
           </div>
         </div>
         <div className="w-full">
-          <video controls className="w-full rounded-lg" src={video.url}></video>
+          <video
+            controls
+            className="w-full rounded-lg"
+            src={video.path}
+          ></video>
         </div>
       </div>
     </AuthenticatedLayout>
