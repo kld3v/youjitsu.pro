@@ -47,7 +47,7 @@ class VideoController extends Controller
     
         // Validate the request
         $request->validate([
-            'video' => 'required|file|mimes:mp4,mov,avi|max:102400', // Limit max size to 100MB
+            'video' => 'required|file|mimes:mp4,mov,avi|max:15728640', // Limit max size to 150MB
             'title' => 'nullable|string|max:255',
             'description' => 'nullable|string|max:500',
         ]);
