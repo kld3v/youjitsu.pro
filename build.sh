@@ -21,20 +21,6 @@ echo "FFmpeg installed successfully in $BIN_DIR."
 echo "export PATH=$BIN_DIR:\$PATH" >> ~/.profile
 source ~/.profile
 
-# Laravel setup
-echo "Clearing caches..."
-php artisan cache:clear
-
-echo "Caching configuration..."
-php artisan config:cache
-
-echo "Caching routes..."
-php artisan route:cache
-
-echo "Caching views..."
-php artisan view:cache
-
-
 
 # Install frontend dependencies
 echo "Installing frontend dependencies..."
