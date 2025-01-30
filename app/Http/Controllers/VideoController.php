@@ -42,6 +42,7 @@ class VideoController extends Controller
      */
     public function store(Request $request)
 {
+
     if (!Auth::check()) {
         return response()->json(['error' => 'Unauthorized'], 401);
     }
@@ -73,6 +74,9 @@ class VideoController extends Controller
 
         // Compress video with FFmpeg
         $compressedPath = storage_path('app/temp/' . $compressedFilename);
+        
+ 
+        
         LaravelFFMpeg::fromDisk('temp')
             ->open($rawFilename)
             ->export()
@@ -81,14 +85,10 @@ class VideoController extends Controller
             ->save($compressedFilename);
 
         Log::info("Compression complete: {$compressedPath}");
-
-        return response([
-            'message' => 'Video compressed successfully',
-            'compressed_file' => $compressedFilename
-        ], 200);        
+     
         // Upload compressed file to Spaces
         Storage::disk('spaces')->put($compressedFilename, file_get_contents($compressedPath), 'public');
-        $compressedUrl = Storage::disk('spaces')->url('compressed_videos/' . $compressedFilename);
+        $compressedUrl = Storage::disk('spaces')->url($compressedFilename);
 
         Log::info("Compressed video uploaded to Spaces: {$compressedUrl}");
 

@@ -3,16 +3,17 @@
 # Ensure the script stops if any command fails
 set -e
 
-# Navigate to your project directory if necessary
-cd /home/bakura/Documents/koderovka/personal/youjitsu
+echo "Updating package lists..."
+apt-get update
+
+echo "Installing FFmpeg..."
+apt-get install -y ffmpeg
+
+echo "FFmpeg installed successfully."
 
 # Clear existing caches
 echo "Clearing caches..."
 php artisan cache:clear
-
-# Generate application key if needed
-echo "Generating application key..."
-php artisan key:generate
 
 # Optimize for production
 echo "Caching configuration..."
@@ -24,12 +25,10 @@ php artisan route:cache
 echo "Caching views..."
 php artisan view:cache
 
-# Run migrations if necessary
-echo "Running migrations..."
-php artisan migrate --force
-
 # Compile assets for production
 echo "Compiling assets for production..."
+echo "Installing frontend dependencies..."
+npm ci --no-progress --no-audit --prefer-offlines
 npm run build
 
 # You might want to check file permissions here, but this is often handled by the deployment environment
