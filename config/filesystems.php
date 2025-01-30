@@ -36,6 +36,7 @@ return [
             'serve' => true,
             'throw' => false,
         ],
+        
         'temp' => [
             'driver' => 'local',
             'root' => storage_path('app/temp'),
@@ -56,7 +57,7 @@ return [
             'region' => env('SPACES_REGION'),
             'bucket' => env('SPACES_BUCKET'),
             'endpoint' => env('SPACES_ENDPOINT'),
-    ],
+        ],
     
  
         // 's3' => [
