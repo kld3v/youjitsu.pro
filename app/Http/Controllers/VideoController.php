@@ -78,11 +78,13 @@ class VideoController extends Controller
  
         
         LaravelFFMpeg::fromDisk('temp')
-            ->open($rawFilename)
-            ->export()
-            ->toDisk('temp')
-            ->inFormat(new \FFMpeg\Format\Video\X264('aac', 'libx264'))
-            ->save($compressedFilename);
+        ->open($rawFilename)
+        ->export()
+        ->toDisk('temp')
+        ->inFormat(new \FFMpeg\Format\Video\X264('aac', 'libx264'))
+        ->addFilter('-preset', 'ultrafast') // Faster encoding
+        ->setBinary('/workspace/bin/ffmpeg', '/workspace/bin/ffprobe') // <-- Force binary paths
+        ->save($compressedFilename);
 
         Log::info("Compression complete: {$compressedPath}");
      

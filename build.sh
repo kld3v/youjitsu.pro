@@ -1,19 +1,25 @@
 #!/bin/bash
 set -e
 
+# Define a local directory for binaries
+BIN_DIR="/workspace/bin"
+mkdir -p "$BIN_DIR"
+
 echo "Downloading FFmpeg..."
 curl -L https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz -o ffmpeg.tar.xz
 
 echo "Extracting FFmpeg..."
 tar -xf ffmpeg.tar.xz
+mv ffmpeg-*-static/ffmpeg "$BIN_DIR/ffmpeg"
+mv ffmpeg-*-static/ffprobe "$BIN_DIR/ffprobe"
+chmod +x "$BIN_DIR/ffmpeg"
+chmod +x "$BIN_DIR/ffprobe"
 
-echo "Moving FFmpeg binary..."
-mv ffmpeg-*-static/ffmpeg /usr/local/bin/ffmpeg
-mv ffmpeg-*-static/ffprobe /usr/local/bin/ffprobe
-chmod +x /usr/local/bin/ffmpeg
-chmod +x /usr/local/bin/ffprobe
+echo "FFmpeg installed successfully in $BIN_DIR."
 
-echo "FFmpeg installed successfully."
+# Set path for runtime use (optional, but useful for Laravel)
+echo "export PATH=$BIN_DIR:\$PATH" >> ~/.profile
+source ~/.profile
 
 # Laravel setup
 echo "Clearing caches..."
