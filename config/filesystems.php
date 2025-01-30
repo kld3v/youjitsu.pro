@@ -36,6 +36,10 @@ return [
             'serve' => true,
             'throw' => false,
         ],
+        'temp' => [
+            'driver' => 'local',
+            'root' => storage_path('app/temp'),
+        ],
 
         'public' => [
             'driver' => 'local',
@@ -53,7 +57,10 @@ return [
             'bucket' => env('SPACES_BUCKET'),
             'endpoint' => env('SPACES_ENDPOINT'),
     ],
-        
+        'ffmpeg' => [
+        'binaries' => env('FFMPEG_PATH', storage_path('app/ffmpeg')),
+    ],
+ 
         // 's3' => [
         //     'driver' => 's3',
         //     'key' => env('AWS_ACCESS_KEY_ID'),
