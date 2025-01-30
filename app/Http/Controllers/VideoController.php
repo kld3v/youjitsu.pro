@@ -77,7 +77,7 @@ class VideoController extends Controller
             $ffmpeg = FFMpeg\FFMpeg::create([
                 'ffmpeg.binaries'  => storage_path('app/workspace/bin/ffmpeg'),  // Full path to ffmpeg binary
                 'ffprobe.binaries' => storage_path('app/workspace/bin/ffprobe'), // Full path to ffprobe binary
-                'timeout'          => 3600, // The timeout for the underlying process
+                'timeout'          => 7200, // The timeout for the underlying process
                 'ffmpeg.threads'   => 12,   // The number of threads that FFMpeg should use
             ]);
     
