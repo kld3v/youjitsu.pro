@@ -1,41 +1,34 @@
 #!/bin/bash
-
-# Ensure the script stops if any command fails
 set -e
 
-echo "Updating package lists..."
-apt-get update
+# Define a local directory for binaries
+BIN_DIR="./storage/app/workspace/bin"
+mkdir -p "$BIN_DIR"
 
-echo "Installing FFmpeg..."
-apt-get install -y ffmpeg
+echo "Downloading FFmpeg..."
+curl -L https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz -o ffmpeg.tar.xz
 
-echo "FFmpeg installed successfully."
+echo "Extracting FFmpeg..."
+tar -xf ffmpeg.tar.xz
+mv ffmpeg-*-static/ffmpeg "$BIN_DIR/ffmpeg"
+mv ffmpeg-*-static/ffprobe "$BIN_DIR/ffprobe"
+chmod +x "$BIN_DIR/ffmpeg"
+chmod +x "$BIN_DIR/ffprobe"
 
-# Clear existing caches
-echo "Clearing caches..."
-php artisan cache:clear
+echo "FFmpeg installed successfully in $BIN_DIR."
 
-# Optimize for production
-echo "Caching configuration..."
-php artisan config:cache
+# Set path for runtime use (optional, but useful for Laravel)
+echo "export PATH=$BIN_DIR:\$PATH" >> ~/.profile
+source ~/.profile
 
-echo "Caching routes..."
-php artisan route:cache
 
-echo "Caching views..."
-php artisan view:cache
+
+# Install frontend dependencies
+echo "Installing frontend dependencies..."
+npm ci --no-progress --no-audit --prefer-offline
 
 # Compile assets for production
 echo "Compiling assets for production..."
-echo "Installing frontend dependencies..."
-npm ci --no-progress --no-audit --prefer-offlines
 npm run build
 
-# You might want to check file permissions here, but this is often handled by the deployment environment
-echo "File permissions should be checked post-deployment if needed."
-
-# Optionally, run tests in a staging environment
-# echo "Running tests..."
-# php artisan test
-
-echo "Build process completed. Your Laravel application is now ready for production deployment."
+echo "Build process completed."

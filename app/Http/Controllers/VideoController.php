@@ -7,8 +7,10 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
+
 use FFMpeg;
-use ProtoneMedia\LaravelFFMpeg\Support\FFMpeg as LaravelFFMpeg;
+use FFMpeg\Format\Video\X264;
+
 
 class VideoController extends Controller
 {
@@ -41,84 +43,87 @@ class VideoController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-{
-
-    if (!Auth::check()) {
-        return response()->json(['error' => 'Unauthorized'], 401);
-    }
-
-    // Validate input
-    $request->validate([
-        'video' => 'required|file|mimes:mp4,mov,avi|max:15728640', // Max 150MB
-        'title' => 'nullable|string|max:255',
-        'description' => 'nullable|string|max:500',
-    ]);
-
-    try {
-        Log::info('Starting video upload process...');
-
-        $file = $request->file('video');
-        if (!$file) {
-            throw new \Exception('No video file found in the request.');
+    {
+        if (!Auth::check()) {
+            return response()->json(['error' => 'Unauthorized'], 401);
         }
-
-        // Generate unique filenames
-        $rawFilename = uniqid('raw_') . '.mp4';
-        $compressedFilename = uniqid('compressed_') . '.mp4';
-
-        // Save raw file locally to reduce Spaces traffic
-        $rawPath = storage_path('app/temp/' . $rawFilename);
-        $file->move(storage_path('app/temp/'), $rawFilename);
-
-        Log::info("Raw video saved locally: {$rawPath}");
-
-        // Compress video with FFmpeg
-        $compressedPath = storage_path('app/temp/' . $compressedFilename);
-        
- 
-        
-        LaravelFFMpeg::fromDisk('temp')
-            ->open($rawFilename)
-            ->export()
-            ->toDisk('temp')
-            ->inFormat(new \FFMpeg\Format\Video\X264('aac', 'libx264'))
-            ->save($compressedFilename);
-
-        Log::info("Compression complete: {$compressedPath}");
-     
-        // Upload compressed file to Spaces
-        Storage::disk('spaces')->put($compressedFilename, file_get_contents($compressedPath), 'public');
-        $compressedUrl = Storage::disk('spaces')->url($compressedFilename);
-
-        Log::info("Compressed video uploaded to Spaces: {$compressedUrl}");
-
-        // Clean up local files
-        unlink($rawPath);
-        unlink($compressedPath);
-        Log::info("Local temp files deleted.");
-
-        // Save video record to DB
-        $video = new Video([
-            'path' => $compressedUrl,
-            'title' => $request->input('title', 'Untitled Video'),
-            'description' => $request->input('description', ''),
-            'user_id' => Auth::id(),
+    
+        // Validate input
+        $request->validate([
+            'video' => 'required|file|mimes:mp4,mov,avi|max:15728640', // Max 150MB
+            'title' => 'nullable|string|max:255',
+            'description' => 'nullable|string|max:500',
         ]);
-        $video->save();
-
-        return response()->json([
-            'message' => 'Video uploaded and compressed successfully',
-            'url' => $compressedUrl,
-        ], 201);
-
-    } catch (\Exception $e) {
-        Log::error('Error uploading video: ' . $e->getMessage());
-        return response()->json([
-            'error' => 'Failed to upload video',
-            'message' => $e->getMessage(),
-        ], 500);
+    
+        try {
+            Log::info('Starting video upload process...');
+    
+            $file = $request->file('video');
+            if (!$file) {
+                throw new \Exception('No video file found in the request.');
+            }
+    
+            // Generate unique filenames
+            $rawFilename = uniqid('raw_') . '.mp4';
+            $compressedFilename = uniqid('compressed_') . '.mp4';
+    
+            // Save raw file locally to reduce Spaces traffic
+            $rawPath = storage_path('app/temp/' . $rawFilename);
+            $file->move(storage_path('app/temp/'), $rawFilename);
+    
+            Log::info("Raw video saved locally: {$rawPath}");
+    
+            // Initialize FFMpeg with correct binary paths
+            $ffmpeg = FFMpeg\FFMpeg::create([
+                'ffmpeg.binaries'  => storage_path('app/workspace/bin/ffmpeg'),  // Full path to ffmpeg binary
+                'ffprobe.binaries' => storage_path('app/workspace/bin/ffprobe'), // Full path to ffprobe binary
+                'timeout'          => 3600, // The timeout for the underlying process
+                'ffmpeg.threads'   => 12,   // The number of threads that FFMpeg should use
+            ]);
+    
+            // Open the video file for processing
+            $video = $ffmpeg->open($rawPath);
+    
+            // Export the video in desired format
+            $format = new X264('aac', 'libx264');  // Specify the video and audio codec
+            $video->save($format, storage_path('app/temp/' . $compressedFilename));
+    
+            Log::info("Compression complete: {$compressedFilename}");
+    
+            // Upload compressed file to Spaces
+            $compressedPath = storage_path('app/temp/' . $compressedFilename);
+            Storage::disk('spaces')->put($compressedFilename, file_get_contents($compressedPath), 'public');
+            $compressedUrl = Storage::disk('spaces')->url($compressedFilename);
+    
+            Log::info("Compressed video uploaded to Spaces: {$compressedUrl}");
+    
+            // Clean up local files
+            unlink($rawPath);
+            unlink($compressedPath);
+            Log::info("Local temp files deleted.");
+    
+            // Save video record to DB
+            $videoRecord = new Video([
+                'path' => $compressedUrl,
+                'title' => $request->input('title', 'Untitled Video'),
+                'description' => $request->input('description', ''),
+                'user_id' => Auth::id(),
+            ]);
+            $videoRecord->save();
+    
+            return response()->json([
+                'message' => 'Video uploaded and compressed successfully',
+                'url' => $compressedUrl,
+            ], 201);
+    
+        } catch (\Exception $e) {
+            Log::error('Error uploading video: ' . $e->getMessage());
+            return response()->json([
+                'error' => 'Failed to upload video',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
     }
-}
 
     
     

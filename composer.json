@@ -17,6 +17,7 @@
         "laravel/tinker": "^2.9",
         "league/flysystem-aws-s3-v3": "^3.29",
         "pbmedia/laravel-ffmpeg": "^8.6",
+        "php-ffmpeg/php-ffmpeg": "^1.3",
         "tightenco/ziggy": "^2.0"
     },
     "require-dev": {
