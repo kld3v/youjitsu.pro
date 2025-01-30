@@ -57,9 +57,9 @@ return [
             'bucket' => env('SPACES_BUCKET'),
             'endpoint' => env('SPACES_ENDPOINT'),
     ],
-        'ffmpeg' => [
-        'binaries' => env('FFMPEG_PATH', storage_path('app/ffmpeg')),
-    ],
+    //     'ffmpeg' => [
+    //     'binaries' => env('FFMPEG_PATH', storage_path('app/ffmpeg')),
+    // ],
  
         // 's3' => [
         //     'driver' => 's3',

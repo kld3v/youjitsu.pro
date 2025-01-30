@@ -82,6 +82,10 @@ class VideoController extends Controller
 
         Log::info("Compression complete: {$compressedPath}");
 
+        return response([
+            'message' => 'Video compressed successfully',
+            'compressed_file' => $compressedFilename
+        ], 200);        
         // Upload compressed file to Spaces
         Storage::disk('spaces')->put($compressedFilename, file_get_contents($compressedPath), 'public');
         $compressedUrl = Storage::disk('spaces')->url('compressed_videos/' . $compressedFilename);
